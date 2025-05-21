@@ -1,0 +1,44 @@
+name: Run Postman Collection
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Newman
+        run: npm install -g newman
+
+      - name: Run Postman Collection
+        run: |
+          newman run /TestKasirAja.postman_collection.json \
+            --environment /KasirAjaTest.postman_environment.json \
+            --env-var "BASE_URL=${{ secrets.BASE_URL }}" \
+            --env-var "fixedAdminEmail=${{ secrets.fixedAdminEmail }}"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.privatedsa }}
+      - name: Check SSH folder content
+        run: ls -la ~/.ssh
+      - name: Check NodeJS version
+        run: node -v
+      - name: rsync connection
+        run: rsync -e "ssh -o StrictHostKeyChecking=no" -arvc * ${{secrets.userdev}}@${{secrets.serverdev}}:/home/gunawan/postman-github/
