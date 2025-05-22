@@ -24,9 +24,7 @@ jobs:
       - name: Run Postman Collection
         run: |
           newman run TestKasirAja.postman_collection.json \
-            --environment KasirAjaTest.postman_environment.json \
-            --env-var "BASE_URL=${{ secrets.BASE_URL }}" \
-            --env-var "fixedAdminEmail=${{ secrets.fixedAdminEmail }}"
+            --environment KasirAjaTest.postman_environment.json 
   deploy:
     runs-on: ubuntu-latest
     steps:
